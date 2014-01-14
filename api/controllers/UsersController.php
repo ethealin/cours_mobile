@@ -21,44 +21,50 @@ class UsersController{
 		Api::response(200,array('data',$data));
 	}
 
-	public function actionUpdate()//à faire
+	public function actionUpdate()
 	{
-		if(isset($_GET['access_token']))//test if admin
+		$data = PUT::get('access_token');
+		
+		if(isset($data['access_token']))//test if admin
 		{	
 			$db = DbController::connect();
-			if(!User::testAdmin($_GET['access_token'],$db))
+			if(!User::testAdmin($data['access_token'],$db))
 			{
 				Api::response(403, array('error'=>"You are not an administrator, you can't create users !"));
 				exit;
 			}
 		}
-		else{Api::response(403, array('error'=>"You are not an administrator, you can't create users !"));exit;}
+		else
+			Api::response(403, array('error'=>"You are not an administrator, you can't create users !"));
 		$idUser = F3::get('PARAMS.id');
-		$rq = 'UPDATE `users` SET (';
-		if(isset($_POST['login']))
+		$rq = 'UPDATE `users` SET ';
+		if(isset($data['login']))
 		{
-			$login = mysql_real_escape_string($_POST['login']);
-			$rq.="`login` = '$login', ";
+			$login = mysql_real_escape_string($data['login']);
+			$rq.="login = '$login',";
 		}
-		if(isset($_POST['email']))
+		if(isset($data['email']))
 		{
-			$email = mysql_real_escape_string($_POST['email']);
-			$rq.="`email` = '$email' ,";
+			$email = mysql_real_escape_string($data['email']);
+			$rq.="email = '$email',";
 		}
-		if(isset($_POST['password']))
+		if(isset($data['password']))
 		{
-			$password = mysql_real_escape_string($_POST['password']);
-			$rq.="`password` = '$password' ,";
+			$password = mysql_real_escape_string($data['password']);
+			$rq.="password = '$password',";
 		}
-		if(isset($_POST['admin']))
+		if(isset($data['admin']))
 		{
-			$admin = mysql_real_escape_string($_POST['admin']);
-			$rq.="`admin` = '$admin' ,";
+			$admin = mysql_real_escape_string($data['admin']);
+			$rq.="admin = $admin,";
 		}
-		if(substr($rq, -1,1) == ',')//à finir mercredu matin
-			$rq = substr($rq,-1);
-		$rq.=');';echo $rq;
-		//$db->exec($rq);
+		if(substr($rq, -1) == ',')
+			$rq = substr($rq,0,strlen($rq)-1);
+		$rq.=" WHERE id = $idUser;";
+		if(!$db->exec($rq))
+			Api::response(200,array('data'=>'the updating request have been done successfuly'));
+		else
+			Api::response(400,array('error'=>'the updating request didn\' success, please try again with other parameters'));
 	}
 
 
@@ -79,10 +85,10 @@ class UsersController{
 	}
 
 	public function actionSubscribe(){
-		if(isset($_POST['access_token']))
+		if(isset($data['access_token']))
 		{
 			$db = DbController::connect();
-			if(!User::testAdmin($_POST['access_token'],$db))
+			if(!User::testAdmin($data['access_token'],$db))
 			{
 				Api::response(403, array('error'=>"You are not an administrator, you can't create users !"));
 				exit;
@@ -90,14 +96,14 @@ class UsersController{
 		}
 		else{Api::response(403, array('error'=>"You are not an administrator, you can't create users !"));exit;}
 
-		if(isset($_POST['email']) && isset($_POST['password']) && isset($_POST['login']))
+		if(isset($data['email']) && isset($data['password']) && isset($data['login']))
 		{
-			$login = mysql_real_escape_string($_POST['login']);
-			$email = mysql_real_escape_string($_POST['email']);
-			$password = md5(mysql_real_escape_string($_POST['password']));
+			$login = mysql_real_escape_string($data['login']);
+			$email = mysql_real_escape_string($data['email']);
+			$password = md5(mysql_real_escape_string($data['password']));
 			$result = $db->query('SELECT MAX(id) as i FROM `users`;')->fetch(PDO::FETCH_ASSOC);
 			$token = md5(1 + (int) $result['i']);
-			if(!isset($_POST['admin']))
+			if(!isset($data['admin']))
 				$db->exec("INSERT INTO `users` (`id`,`login`,`email`,`password`,`token`) VALUES ('','$login','$email','$password','$token')");
 			else
 				$db->exec("INSERT INTO `users` (`id`,`login`,`email`,`password`,`token`,`admin`) VALUES ('','$login','$email','$password','$token','1')");

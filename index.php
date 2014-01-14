@@ -16,10 +16,4 @@ $f3->route('GET /v1',
 	}
 );*/
 
-//test route PUT /v1/users/@id
-$f3->route('GET /v1/put/users/update',
-	function($f3) {
-		$f3->mock('PUT /v1/users/3',array('access_token'=>'e4da3b7fbbce2345d7772b0674a318d5'));  // set the route that f3 will run
-	}
-);
 $f3->run();
