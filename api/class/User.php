@@ -30,6 +30,25 @@ class User{
 		}
 	}
 
+	//test if you are an admin based on access_token
+	public static function testAdmin($access_token,$db)
+	{
+		$access_token = mysql_real_escape_string($access_token);
+		$result = $db->query("SELECT `admin` FROM `users` WHERE `token` = '$access_token';")->fetch(PDO::FETCH_ASSOC);
+		if($result['admin'] == 0)
+			return false;
+		else
+			return true;
+	}
+
+	//test if your token is in the database
+	public static function testUser($access_token,$db)//return user's id
+	{
+		$access_token = mysql_real_escape_string($access_token);
+		$result = $db->query("SELECT `id` FROM `users` WHERE `token` = '$access_token';")->fetch(PDO::FETCH_ASSOC);
+		return $result['id'];
+	}
+
 	//get all users
 	public static function findAll($db)
 	{
@@ -43,18 +62,35 @@ class User{
 		}
 		return $contents;
 	}
-
-	//test if you are an admin based on access_token
-	public static function testAdmin($access_token,$db)
-	{
-		$access_token = mysql_real_escape_string($access_token);
-		$result = $db->query("SELECT `admin` FROM `users` WHERE `token` = '$access_token';")->fetch(PDO::FETCH_ASSOC);
-		if($result['admin'] == 0)
-			return false;
-		else
-			return true;
-	}
 	
+	public function update(User $data,$db)
+	{
+		$rq = 'UPDATE `users` SET ';
+		if($data->login != 'none')
+		{
+			$login = mysql_real_escape_string($data->login);
+			$rq.="login = '$login',";
+		}
+		if($data->email != 'none')
+		{
+			$email = mysql_real_escape_string($data->email);
+			$rq.="email = '$email',";
+		}
+		if($data->password != 'none')
+		{
+			$password = mysql_real_escape_string($data->password);
+			$rq.="password = '$password',";
+		}
+		if($data->admin != -1)
+		{
+			$admin = mysql_real_escape_string($data->admin);
+			$rq.="admin = $admin,";
+		}
+		if(substr($rq, -1) == ',')
+			$rq = substr($rq,0,strlen($rq)-1);
+		$rq.=" WHERE id = ".$data->id.";";
+		return $db->exec($rq);
+	}
 	//getters & setters
 	public function getId(){return $this->id;}
 	public function getLogin(){return $this->login;}
