@@ -45,16 +45,15 @@ class FilmsLikedController{
 				Api::response(403, array('error'=>"You are not the right user, please log in."));
 				exit;
 			}
-			else if()
 		}
 		else
 			{Api::response(403, array('error'=>"You have to be logged by an acces token"));exit;}
 		if(isset($_POST['id_users']) && isset($_POST['id_films']))
 		{
-			if(empty(FilmWatched::findOne($_POST['id_users']),$_POST['id_films'])),$db)
+			if(!is_array(FilmWatched::findOne($_POST['id_users'],$_POST['id_films'],$db)))
 			{
 				Api::response(400,array('error'=>'this user did\t watch this movie, he can\' t like it !!'));
-				exit:
+				exit;
 			}
 			$data = array('id_users'=>mysql_real_escape_string($_POST['id_users']),'id_films'=>mysql_real_escape_string($_POST['id_films']));
 			$filmLiked = FilmLiked::create($data,$db);

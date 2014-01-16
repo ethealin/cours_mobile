@@ -23,7 +23,7 @@ class User{
 		}
 	}
 
-	public function __construct($contenu){
+	public function __construct($contenu = false){
 		if(is_array($contenu))
 		{
 			$this->hydrate($contenu);
@@ -35,7 +35,7 @@ class User{
 	{
 		$access_token = mysql_real_escape_string($access_token);
 		$result = $db->query("SELECT `admin` FROM `users` WHERE `token` = '$access_token';")->fetch(PDO::FETCH_ASSOC);
-		if($result['admin'] == 0)
+		if((int) $result['admin'] == 0)
 			return false;
 		else
 			return true;
@@ -47,6 +47,38 @@ class User{
 		$access_token = mysql_real_escape_string($access_token);
 		$result = $db->query("SELECT `id` FROM `users` WHERE `token` = '$access_token';")->fetch(PDO::FETCH_ASSOC);
 		return $result['id'];
+	}
+
+	public static function login($email,$password,$db)
+	{
+		$q = $db->query("SELECT * FROM `users` WHERE `email` = '$email' AND `password` = '$password';")->fetch(PDO::FETCH_ASSOC);
+		if(!empty($q))
+		{
+			$q['id'] = (int) $q['id'];
+			$q['admin'] = (int) $q['admin'];
+			$user = new User($q);
+			return $user;
+		}
+		else
+			return 1;
+	}
+
+	public static function subscribe($datas,$db)
+	{
+		extract($datas);
+		$result = $db->query('SELECT MAX(id) as i FROM `users`;')->fetch(PDO::FETCH_ASSOC);
+		$token = md5(1 + (int) $result['i']);
+		if(!isset($datas['admin']))
+		{
+			$q = $db->exec("INSERT INTO `users` (`id`,`login`,`email`,`password`,`token`) VALUES ('','$login','$email','$password','$token')");
+			$datas['admin'] = 0;
+		}
+		else
+			$q = $db->exec("INSERT INTO `users` (`id`,`login`,`email`,`password`,`token`,`admin`) VALUES ('','$login','$email','$password','$token','1')");
+		$datas['id'] = (int) $db->lastInsertId();
+		$datas['token'] = $token;
+		$user = new User($datas);
+		return $user;
 	}
 
 	//get all users
@@ -63,33 +95,56 @@ class User{
 		return $contents;
 	}
 	
+	public static function findOne($id,$db)
+	{		
+		$q = $db->query("SELECT * FROM `users` WHERE `id` = $id ;")->fetch(PDO::FETCH_ASSOC);
+		if(empty($q))
+		{
+			Api::response(400,array('error'=>'this id doesn\'t exist.'));exit;
+		}
+		$q['id'] = (int) $q['id'];
+		$q['admin'] = (int) $q['admin'];
+		$q['password'] = 'hidden';
+		return new User($q);
+	}
+
 	public function update(User $data,$db)
 	{
 		$rq = 'UPDATE `users` SET ';
-		if($data->login != 'none')
+		if($data->getLogin() != 'none')
 		{
-			$login = mysql_real_escape_string($data->login);
+			$login = mysql_real_escape_string($data->getLogin());
 			$rq.="login = '$login',";
 		}
-		if($data->email != 'none')
+		if($data->getEmail() != 'none')
 		{
-			$email = mysql_real_escape_string($data->email);
+			$email = mysql_real_escape_string($data->getEmail());
 			$rq.="email = '$email',";
 		}
-		if($data->password != 'none')
+		if($data->getPassword() != 'none')
 		{
-			$password = mysql_real_escape_string($data->password);
+			$password = mysql_real_escape_string($data->getPassword());
 			$rq.="password = '$password',";
 		}
-		if($data->admin != -1)
+		if($data->getAdmin() != -1)
 		{
-			$admin = mysql_real_escape_string($data->admin);
+			$admin = mysql_real_escape_string($data->getAdmin());
 			$rq.="admin = $admin,";
 		}
 		if(substr($rq, -1) == ',')
 			$rq = substr($rq,0,strlen($rq)-1);
-		$rq.=" WHERE id = ".$data->id.";";
+		$rq.=" WHERE id = ".$data->getId().";";
 		return $db->exec($rq);
+	}
+
+	public function delete(User $data,$db)
+	{
+		$id = $data->getId();
+		$q = $db->exec("DELETE FROM `users` WHERE `id` = $id;");
+		if($q != 0)
+			return true;
+		else
+			return false;
 	}
 	//getters & setters
 	public function getId(){return $this->id;}

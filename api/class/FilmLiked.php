@@ -31,14 +31,15 @@ class FilmLiked{
 	{
 
 		$data = $db->query("SELECT * FROM `films_liked` WHERE `id_films` = $id_films AND `id_users` = $id_users;")->fetch(PDO::FETCH_ASSOC);
-		$data['id'] = (int) $data['id'];
-		$data['id_films'] = (int) $data['id_films'];
-		$data['id_users'] = (int) $data['id_users'];
-		try{return $data = new FilmLiked($data);}
-		catch(Exception $e)
+		if(isset($data['id']) && isset($data['id_films']) && isset($data['id_users']))
 		{
-			return new Array();
+			$data['id'] = (int) $data['id'];
+			$data['id_films'] = (int) $data['id_films'];
+			$data['id_users'] = (int) $data['id_users'];
+			return $data = new FilmLiked($data);
 		}
+		else
+			return array();
 	}	
 	
 	public static function create($data,$db)

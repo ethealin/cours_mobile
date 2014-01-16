@@ -24,11 +24,29 @@ class UsersController{
 			Api::response(400,array('error'=>'your request has failed'));
 	}
 
+	public function actionFindOne()
+	{
+		$data = $_GET;
+		if(isset($data['access_token']))
+		{	
+			$db = DbController::connect();
+			if(!User::testAdmin($data['access_token'],$db))
+			{
+				Api::response(403, array('error'=>"You are not an administrator, you can't update users !"));
+				exit;
+			}
+		}
+		else
+			Api::response(403, array('error'=>"You are not an administrator, you can't update users !"));
+		$id = F3::get('PARAMS.id');
+		$user = User::findOne($id,$db);
+		Api::response(200,array('data'=>$user));
+	}
 	public function actionUpdate()
 	{
-		$data = PUT::get('access_token');
-		
-		if(isset($data['access_token']))//test if admin
+		$data = PUT::get();
+		$data['access_token'] = $_GET['access_token'];
+		if(isset($data['access_token']))
 		{	
 			$db = DbController::connect();
 			if(!User::testAdmin($data['access_token'],$db))
@@ -53,7 +71,7 @@ class UsersController{
 			$data['email'] = 'none';
 		$user = new User($data);
 		$return = $user->update($user,$db);
-		if($return == 1)
+		if($return != 0)
 			Api::response(200,array('data'=>'the updating request have been done successfuly'));
 		else
 			Api::response(400,array('error'=>'the updating request didn\'t success, please try again with other parameters'));
@@ -62,7 +80,7 @@ class UsersController{
 	public function actionDelete()
 	{
 		$data = array_map('mysql_real_escape_string', $_GET);
-		if(isset($data['access_token']))//test if admin
+		if(isset($data['access_token']))
 		{	
 			$db = DbController::connect();
 			if(!User::testAdmin($data['access_token'],$db))
@@ -73,9 +91,11 @@ class UsersController{
 		}
 		else
 			Api::response(403, array('error'=>"You are not an administrator, you can't update users !"));
-		$idUser = F3::get('PARAMS.id');
-		$query = "DELETE FROM `users` WHERE `id` = $idUser";
-		if($db->exec($query))
+		$idUser = (int) F3::get('PARAMS.id');
+		$user = new User();
+		$user->setId($idUser);
+		$return = $user->delete($user,$db);
+		if($return)
 			Api::response(200,array('data'=>'the deleting request have been done successfuly'));
 		else
 			Api::response(400,array('error'=>'the deleting request didn\'t success, please try again with other parameters'));
@@ -88,8 +108,11 @@ class UsersController{
 			$email = mysql_real_escape_string($_GET['email']);
 			$password = md5(mysql_real_escape_string($_GET['password']));
 			$db = DbController::connect();
-			$result = $db->query("SELECT * FROM `users` WHERE `email` = '$email' AND `password` = '$password';")->fetch(PDO::FETCH_ASSOC);
-			Api::response(200, array('data'=>'Login success, access_token = '.$result['token']));
+			$user = User::login($email,$password,$db);
+			if(gettype($user) != 'integer')
+				Api::response(200, array('data'=>'Login success, access_token = '.$user->getToken()));
+			else
+				Api::response(400, array('error'=>'Missing datas'));
 		}
 		else
 		{
@@ -111,16 +134,13 @@ class UsersController{
 
 		if(isset($_POST['email']) && isset($_POST['password']) && isset($_POST['login']))
 		{
-			$login = mysql_real_escape_string($_POST['login']);
-			$email = mysql_real_escape_string($_POST['email']);
-			$password = md5(mysql_real_escape_string($_POST['password']));
-			$result = $db->query('SELECT MAX(id) as i FROM `users`;')->fetch(PDO::FETCH_ASSOC);
-			$token = md5(1 + (int) $result['i']);
-			if(!isset($data['admin']))
-				$db->exec("INSERT INTO `users` (`id`,`login`,`email`,`password`,`token`) VALUES ('','$login','$email','$password','$token')");
-			else
-				$db->exec("INSERT INTO `users` (`id`,`login`,`email`,`password`,`token`,`admin`) VALUES ('','$login','$email','$password','$token','1')");
-			$data = 'Subscribed with this token : '.$token;
+			$datas = $_POST;
+			foreach($datas as $key => $value)
+			{
+				$data[$key] = mysql_real_escape_string($value);
+			}
+			$user = User::subscribe($datas,$db);
+			$data = 'Subscribed with this user token : '.$user->getToken();
 			Api::response(200, array('data'=>$data));
 		}
 		else

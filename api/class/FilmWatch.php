@@ -31,10 +31,15 @@ class FilmWatch{
 	{
 
 		$data = $db->query("SELECT * FROM `films_watch` WHERE `id_films` = $id_films AND `id_users` = $id_users;")->fetch(PDO::FETCH_ASSOC);
-		$data['id'] = (int) $data['id'];
-		$data['id_films'] = (int) $data['id_films'];
-		$data['id_users'] = (int) $data['id_users'];
-		return $data = new FilmWatch($data);
+		if(isset($data['id']) && isset($data['id_films']) && isset($data['id_users']))
+		{
+			$data['id'] = (int) $data['id'];
+			$data['id_films'] = (int) $data['id_films'];
+			$data['id_users'] = (int) $data['id_users'];
+			return $data = new FilmWatch($data);
+		}
+		else
+			return array();
 	}	
 	
 	public static function create($data,$db)

@@ -23,8 +23,8 @@ class FilmsController{
 
 	public function actionUpdate()
 	{
-		$data = PUT::get('access_token');
-		
+		$data = PUT::get();
+		$data['access_token'] = $_GET['access_token'];
 		if(isset($data['access_token']))
 		{	
 			$db = DbController::connect();

@@ -21,7 +21,7 @@ class Film{
 		}
 	}
 
-	public function __construct($contenu){
+	public function __construct($contenu  = false){
 		if(is_array($contenu))
 		{
 			$this->hydrate($contenu);
@@ -43,7 +43,11 @@ class Film{
 
 	public static function findOne($id,$db)
 	{
-		$data = $db->query("SELECT * FROM `films` WHERE `id` = '$id';")->fetch(PDO::FETCH_ASSOC);
+		$data = $db->query("SELECT * FROM `films` WHERE `id` = $id;")->fetch(PDO::FETCH_ASSOC);
+		if(empty($data))
+		{
+			Api::response(400,array('error'=>'this id doesn\'t exist.'));exit;
+		}
 		$data['id'] = (int) $data['id'];
 		return $data = new Film($data);
 	}	

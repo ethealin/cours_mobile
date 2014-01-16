@@ -6,7 +6,7 @@ class Api{
 
 		header('Content-type: application/json; charset=utf-8');
 		header('HTTP/1.1 '. self::status($code));
-	
+		
 		$response = array('meta'=>array('code'=>$code));
 
 		if($error){
