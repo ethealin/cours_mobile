@@ -19,13 +19,19 @@ PUT /v1/films/@id = FilmsController->actionUpdate									=> It works
 DELETE /v1/films/@id = FilmsController->actionDelete								=> It works
 
 ;routes for films watched
+GET /v1/films/watched = FilmsWatchedController->actionFindAll						=> It works
+GET /v1/films/watched/@id = FilmsWatchedController->actionFindByUser				=> It works
 POST /v1/films/watched = FilmsWatchedController->actionCreate						=> It works
 DELETE /v1/films/watched/@id_film = FilmsWatchedController->actionDelete			=> It works
 
 ;routes for films liked
+GET /v1/films/liked = FilmsLikedController->actionFindAll							=> It works
+GET /v1/films/liked/@id = FilmsLikedController->actionFindByUser					=> It works
 POST /v1/films/liked = FilmsLikedController->actionCreate							=> It works
 DELETE /v1/films/liked/@id_film = FilmsLikedController->actionDelete				=> It works
 
 ;routes for films would_watch
+GET /v1/films/watch = FilmsWatchController->actionFindAll							=> It works
+GET /v1/films/watch/@id = FilmsWatchController->actionFindByUser					=> It works
 POST /v1/films/watch = FilmsWatchController->actionCreate							=> It works
 DELETE /v1/films/watch/@id_film = FilmsWatchController->actionDelete				=> It works

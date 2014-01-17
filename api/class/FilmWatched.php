@@ -14,7 +14,6 @@ class FilmWatched{
 		$this->id_films = $id_films;
 	}
 
-	//get all films
 	public static function findAll($db)
 	{
 		$contents = array();
@@ -27,20 +26,17 @@ class FilmWatched{
 		return $contents;
 	}
 
-	public static function findOne($id_films,$id_users,$db)//return a FilmWatched object
+	public static function findByUser($idUsers,$db)
 	{
-
-		$data = $db->query("SELECT * FROM `films_watched` WHERE `id_films` = $id_films AND `id_users` = $id_users;")->fetch(PDO::FETCH_ASSOC);
-		if(isset($data['id']) && isset($data['id_films']) && isset($data['id_users']))
+		$contents = array();
+		$q = $db->query("SELECT * FROM `films_watched` WHERE `id_users` = $idUsers;");
+		while ($datas = $q->fetch(PDO::FETCH_ASSOC))
 		{
-			$data['id'] = (int) $data['id'];
-			$data['id_films'] = (int) $data['id_films'];
-			$data['id_users'] = (int) $data['id_users'];
-			return $data = new FilmWatched($data);
+			$datas['id'] = (int) $datas['id'];
+			$contents[] = new FilmWatched($datas);
 		}
-		else
-			return array();
-	}	
+		return $contents;
+	}
 	
 	public static function create($data,$db)
 	{

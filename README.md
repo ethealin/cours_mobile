@@ -16,13 +16,17 @@ GET /v1/users
 ```
 It needs $access_token with GET method.
 ```
+GET /v1/users/@id
+```
+It need @id parameters ( user's id ) and an administrator $access_token with GET method
+```
 PUT /v1/users/@id 
 ```
-It needs the id parameter and the administrator token : $access_token. Others parameters are optionals : $login, $password, $admin, $email, $token
+It needs the id parameter and the administrator token : $access_token ( in GET method ). Others parameters are optionals : $login, $password, $admin, $email, $token
 ```
 DELETE /v1/users/@id 
 ```
-It needs the id parameter and the administrator token : $access_token.
+It needs the id parameter and the administrator token : $access_token( in GET method ).
 ```
 GET /v1/films 
 ```
@@ -44,6 +48,14 @@ DELETE /v1/films/@id
 ```
 It needs the id parameter and the administrator token : $access_token.
 ```
+GET /v1/films/watched
+```
+It needs nothing.
+```
+GET /v1/films/watched/@id
+```
+It only needs @id parameter
+```
 POST /v1/films/watched 
 ```
 It needs $id_users and $id_films with POST method AND the related user's $access_token with GET method.
@@ -52,6 +64,14 @@ DELETE /v1/films/watched/@id_film
 ```
 it needs the @id_film parameter and the related user's $access_token with GET method.
 ```
+GET /v1/films/liked
+```
+It needs nothing.
+```
+GET /v1/films/liked/@id
+```
+It only needs @id parameter
+```
 POST /v1/films/liked 
 ```
 It needs $id_users and $id_films with POST method AND the related user's $access_token with GET method.
@@ -59,6 +79,14 @@ It needs $id_users and $id_films with POST method AND the related user's $access
 DELETE /v1/films/liked/@id_film 
 ```
 it needs the @id_film parameter and the related user's $access_token with GET method.
+```
+GET /v1/films/watch
+```
+It needs nothing.
+```
+GET /v1/films/watch/@id
+```
+It only needs @id parameter
 ```
 POST /v1/films/watch 
 ```

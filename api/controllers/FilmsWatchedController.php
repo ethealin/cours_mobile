@@ -2,11 +2,20 @@
 
 class FilmsWatchedController{
 
-	//get all films
 	public function actionFindAll()
 	{
 		$db = DbController::connect();
 		$data = FilmWatched::findAll($db);
+		if(!empty($data))
+			Api::response(200,array('data',$data));
+		else
+			Api::response(400,array('error'=>'your request has failed'));
+	}
+
+	public function actionFindByUser()
+	{
+		$db = DbController::connect();
+		$data = FilmWatched::findByUser(F3::get('PARAMS.id_users'),$db);
 		if(!empty($data))
 			Api::response(200,array('data',$data));
 		else
