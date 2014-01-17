@@ -1,5 +1,8 @@
 # API Documention
 
+## Notifications
+I have added 4 lines in framework/base.php to catch the 404 error and send a response using Api class.
+
 ## Endpoints
 
 ```

@@ -976,6 +976,11 @@ class Base extends Prefab {
 		$req=$this->hive['VERB'].' '.$this->hive['PATH'];
 		if (!$text)
 			$text='HTTP '.$code.' ('.$req.')';
+		if($code == 404)
+		{
+			Api::response(404, 0);
+			exit;
+		}
 		error_log($text);
 		if (!$trace)
 			$trace=array_slice(debug_backtrace(FALSE),1);
