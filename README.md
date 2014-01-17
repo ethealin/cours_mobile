@@ -66,7 +66,7 @@ It needs $id_users and $id_films with POST method AND the related user's $access
 ```
 DELETE /v1/films/watched/@id_film 
 ```
-it needs the @id_film parameter and the related user's $access_token with GET method.
+It needs the @id_film parameter and the related user's $access_token with GET method.
 ```
 GET /v1/films/liked
 ```
@@ -82,7 +82,7 @@ It needs $id_users and $id_films with POST method AND the related user's $access
 ```
 DELETE /v1/films/liked/@id_film 
 ```
-it needs the @id_film parameter and the related user's $access_token with GET method.
+It needs the @id_film parameter and the related user's $access_token with GET method.
 ```
 GET /v1/films/watch
 ```
@@ -98,4 +98,4 @@ It needs $id_users and $id_films with POST method AND the related user's $access
 ```
 DELETE /v1/films/watch/@id_film 
 ```
-it needs the @id_film parameter and the related user's $access_token with GET method.
+It needs the @id_film parameter and the related user's $access_token with GET method.
