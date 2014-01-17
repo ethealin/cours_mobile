@@ -1,12 +1,13 @@
 # API Documention
 
 ## Notifications
-I have added 4 lines in framework/base.php to catch the 404 error and send a response using Api class.
+- I have added 4 lines ( lines 979 to 983 ) in "framework/base.php" to catch the 404 error and send a response using Api class.
+- I have done many tests to protect a little bit this API but I didn't finish yet. That's why sometimes some methods are more restrictive than others.
 
 ## Endpoints
 
 ```
-GET /v1/login 
+GET /v1/login	
 ```
 It needs $email and $password with GET method as string.
 
